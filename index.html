@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 8 Tuesday Practice Quiz</title>
+<style>
+    /* --- Color Variables --- */
+    :root {
+        /* Default: Dark Theme */
+        --bg-color: #2d343e; /* Dark background */
+        --container-bg: #3c424f; /* Slightly lighter container */
+        --text-color: #e8e6e3; /* Light text */
+        --question-text-color: #8ab4f8; /* Light blue for questions */
+        --lo-text-color: #b0c4de; /* Lighter blue for learning objective */
+        --border-color: #555; /* Darker borders */
+        --separator-color: #4a4f5a;
+        --label-bg: #454c5a;
+        --label-border: #6c757d;
+        --label-hover-bg: #525966;
+        --label-hover-border: #7a828a;
+        --button-bg: #8ab4f8;
+        --button-text: #202124;
+        --button-hover-bg: #a3c5f9;
+        --button-disabled-bg: #5f6368;
+        --feedback-correct-bg: #344e41;
+        --feedback-correct-text: #c7f9cc;
+        --feedback-correct-border: #52b788;
+        --feedback-incorrect-bg: #5e2129;
+        --feedback-incorrect-text: #f8d7da;
+        --feedback-incorrect-border: #a4133c;
+        --feedback-rationale-text: #adb5bd; /* Lighter gray for rationale */
+        --feedback-source-text: #c7d3e0;
+        --feedback-separator: #6c757d;
+        --radio-accent: #8ab4f8;
+    }
+
+    .light-theme {
+        --bg-color: #eef2f7;
+        --container-bg: #ffffff;
+        --text-color: #343a40;
+        --question-text-color: #0056b3;
+        --lo-text-color: #5a6e8a;
+        --border-color: #dee2e6;
+        --separator-color: #e9ecef;
+        --label-bg: #f8f9fa;
+        --label-border: #ced4da;
+        --label-hover-bg: #e2e6ea;
+        --label-hover-border: #adb5bd;
+        --button-bg: #007bff;
+        --button-text: white;
+        --button-hover-bg: #0056b3;
+        --button-disabled-bg: #6c757d;
+        --feedback-correct-bg: #d1e7dd;
+        --feedback-correct-text: #0f5132;
+        --feedback-correct-border: #badbcc;
+        --feedback-incorrect-bg: #f8d7da;
+        --feedback-incorrect-text: #842029;
+        --feedback-incorrect-border: #f5c2c7;
+        --feedback-rationale-text: #495057;
+        --feedback-source-text: #343a40;
+        --feedback-separator: #ccc;
+        --radio-accent: #007bff;
+    }
+
+    /* --- General Styles --- */
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        line-height: 1.7;
+        margin: 0;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        padding-bottom: 40px;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    #theme-toggle-button {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        padding: 8px 12px;
+        background-color: var(--button-bg);
+        color: var(--button-text);
+        border: 1px solid var(--label-border);
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9em;
+        z-index: 1000;
+         transition: background-color 0.3s, color 0.3s;
+    }
+     #theme-toggle-button:hover {
+         opacity: 0.8;
+     }
+
+
+    #quiz-container {
+        max-width: 900px;
+        margin: 80px auto 30px auto;
+        background: var(--container-bg);
+        padding: 25px 35px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--border-color);
+        transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .question-block {
+        margin-bottom: 35px;
+        padding-bottom: 25px;
+        border-bottom: 1px solid var(--separator-color);
+        transition: border-color 0.3s;
+    }
+
+    .question-block:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 5px;
+    }
+    
+    .learning-objective {
+        font-size: 0.85em;
+        font-style: italic;
+        color: var(--lo-text-color);
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px dashed var(--separator-color);
+    }
+
+    .question-text {
+        font-weight: 600;
+        font-size: 1.1em;
+        margin-bottom: 18px;
+        color: var(--question-text-color);
+        transition: color 0.3s;
+    }
+
+    .options label {
+        display: block;
+        margin-bottom: 12px;
+        cursor: pointer;
+        padding: 10px 15px;
+        border-radius: 6px;
+        border: 1px solid var(--label-border);
+        background-color: var(--label-bg);
+        transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+    }
+
+    .options label:hover {
+        background-color: var(--label-hover-bg);
+        border-color: var(--label-hover-border);
+    }
+
+    .options input[type="radio"]:checked+span {
+         font-weight: bold;
+         color: var(--question-text-color);
+    }
+    .options input[type="radio"] {
+        margin-right: 12px;
+        accent-color: var(--radio-accent);
+    }
+
+    .button-container {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .check-button {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.95em;
+        transition: background-color 0.2s, color 0.2s, opacity 0.2s;
+        background-color: var(--button-bg);
+        color: var(--button-text);
+    }
+
+    .check-button:hover {
+        opacity: 0.85;
+    }
+
+     .check-button:disabled {
+         background-color: var(--button-disabled-bg);
+         cursor: not-allowed;
+         opacity: 0.7;
+     }
+
+    .feedback {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 6px;
+        font-size: 0.95em;
+        display: none;
+        border: 1px solid transparent;
+        transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    }
+
+    .feedback.correct {
+        background-color: var(--feedback-correct-bg);
+        color: var(--feedback-correct-text);
+        border-color: var(--feedback-correct-border);
+        display: block;
+    }
+
+    .feedback.incorrect {
+        background-color: var(--feedback-incorrect-bg);
+        color: var(--feedback-incorrect-text);
+        border-color: var(--feedback-incorrect-border);
+        display: block;
+    }
+
+    .feedback-status {
+         font-weight: bold;
+         font-size: 1.1em;
+         display: block;
+         margin-bottom: 8px;
+    }
+
+    .feedback-rationale {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px dashed var(--feedback-separator);
+        font-size: 0.9em;
+        color: var(--feedback-rationale-text);
+        transition: color 0.3s, border-color 0.3s;
+    }
+    
+    .feedback-source {
+        margin-top: 10px;
+        font-size: 0.85em;
+        font-style: italic;
+        color: var(--feedback-source-text);
+        background-color: rgba(0,0,0,0.1);
+        padding: 8px;
+        border-radius: 4px;
+    }
+
+    h1 {
+        text-align: center;
+        color: var(--question-text-color);
+        margin-top: 30px;
+        margin-bottom: 30px;
+        font-weight: 600;
+        transition: color 0.3s;
+    }
+
+</style>
+</head>
+<body>
+
+    <button id="theme-toggle-button">Toggle Theme</button>
+    <h1>Week 8 Tuesday Practice Quiz</h1>
+
+    <div id="quiz-container">
+        <!-- Questions will be loaded here by JavaScript -->
+    </div>
+
+<script>
+    const quizData = [
+        // Gram-negative Rods LOs
+        {
+            learningObjective: "LO1 (Gram-negative Rods): Distinguish cell wall structures of Gram (+) & Gram (-) bacteria",
+            question: "A key structural difference between Gram-positive and Gram-negative bacterial cell walls is that Gram-negative bacteria possess an outer membrane. Which of the following is a major component of this outer membrane?",
+            options: { A: "Teichoic acid", B: "Lipoteichoic acid", C: "A thick layer of peptidoglycan", D: "Lipopolysaccharide (LPS)", E: "Mycolic acid" },
+            correctAnswer: "D",
+            rationale: "The outer membrane is a defining feature of Gram-negative bacteria and is composed of a phospholipid bilayer where the outer leaflet is primarily made of lipopolysaccharide (LPS). Gram-positive bacteria lack an outer membrane and instead have a thick peptidoglycan layer containing teichoic and lipoteichoic acids.",
+            source: "'Gram-negative organisms have an inner, cytoplasmic membrane like Gram-positives do, but what is vastly different is that there is a Second outer membrane on top of peptidoglycan... Contains lipopolysaccharide.' (Gram-negative Rods Handout, Page 7)"
+        },
+        {
+            learningObjective: "LO1 (Gram-negative Rods): Distinguish cell wall structures of Gram (+) & Gram (-) bacteria",
+            question: "During the Gram stain procedure, the alcohol wash step decolorizes Gram-negative bacteria but not Gram-positive bacteria. This difference in dye retention is primarily due to:",
+            options: { A: "The presence of a capsule in Gram-positive bacteria", B: "The thickness of the peptidoglycan layer", C: "The presence of porins in Gram-negative bacteria", D: "The presence of sterols in the Gram-positive membrane", E: "The motility of Gram-negative bacteria" },
+            correctAnswer: "B",
+            rationale: "Gram-positive bacteria have a very thick, highly cross-linked peptidoglycan layer which traps the large crystal violet-iodine complex. Gram-negative bacteria have a much thinner peptidoglycan layer, which does not effectively retain the complex when the outer membrane is disrupted by the alcohol decolorizer.",
+            source: "'Thin layer of peptidoglycan (small amt explains why they stain red on Gram stain).' (Gram-negative Rods Handout, Page 1)"
+        },
+        {
+            learningObjective: "LO1 (Gram-negative Rods): Distinguish cell wall structures of Gram (+) & Gram (-) bacteria",
+            question: "A new antibiotic is discovered that cannot penetrate the outer membrane of Gram-negative bacteria, rendering it ineffective against these organisms. Which of the following organisms would likely be resistant to this new drug?",
+            options: { A: "Staphylococcus aureus", B: "Streptococcus pyogenes", C: "Listeria monocytogenes", D: "Escherichia coli", E: "Clostridium perfringens" },
+            correctAnswer: "D",
+            rationale: "Escherichia coli is a Gram-negative bacterium and possesses an outer membrane that acts as a permeability barrier. The other options are all Gram-positive bacteria, which lack this outer membrane.",
+            source: "'Gram-negative cell walls: vastly different from Gram-positives... Second outer membrane on top of peptidoglycan.' (Gram-negative Rods Handout, Pages 6-7)"
+        },
+        {
+            learningObjective: "LO2 (Gram-negative Rods): Define endotoxin",
+            question: "Which component of the lipopolysaccharide (LPS) molecule is responsible for its toxic activity, causing fever and septic shock?",
+            options: { A: "O-side chain", B: "Core polysaccharide", C: "Lipid A", D: "KDO (2-keto-3-deoxyoctulosonic acid)", E: "Heptose" },
+            correctAnswer: "C",
+            rationale: "Lipid A is the lipid portion of LPS that anchors the molecule in the outer membrane. It is the component recognized by the host's immune system as a potent PAMP (pathogen-associated molecular pattern) and is responsible for the toxic effects of endotoxin.",
+            source: "'Lipid A + attached polysaccharides... make up endotoxin.' and 'Virtually all Gram-negative organisms possess lipid A.' (Gram-negative Rods Handout, Page 1)"
+        },
+        {
+            learningObjective: "LO2 (Gram-negative Rods): Define endotoxin",
+            question: "The O-side chain of endotoxin is a long, repeating oligosaccharide that extends from the bacterial surface. What is the primary significance of this structure?",
+            options: { A: "It is identical across all Gram-negative bacteria.", B: "It anchors the endotoxin to the outer membrane.", C: "It is the primary toxic component of endotoxin.", D: "It is highly variable and defines the 'O antigen' used for serotyping.", E: "It forms porin channels for nutrient transport." },
+            correctAnswer: "D",
+            rationale: "The O-side chain, or O antigen, is the most variable part of the LPS molecule. Its specific sugar composition varies between different species and even between strains of the same species (e.g., E. coli O157). This variability is used in serological classification.",
+            source: "'O-side chain (further to exterior)--0-50 repeating oligosaccharides... “Outer antigen” (unique for each type of organism; varies even in the same species).' (Gram-negative Rods Handout, Page 1)"
+        },
+        {
+            learningObjective: "LO2 (Gram-negative Rods): Define endotoxin",
+            question: "Endotoxin is a structural component of the bacterial cell wall that is released in large quantities during bacterial lysis. This contrasts with exotoxins, which are typically:",
+            options: { A: "Lipids actively secreted by living bacteria.", B: "Proteins actively secreted by living bacteria.", C: "Carbohydrates that are only released upon cell death.", D: "Less potent than endotoxin.", E: "Always heat-stable." },
+            correctAnswer: "B",
+            rationale: "The key distinction is that endotoxin (LPS) is an integral part of the Gram-negative cell wall, whereas exotoxins are proteins that are actively synthesized and secreted by both Gram-positive and Gram-negative bacteria.",
+            source: "'Endotoxin: Outer membrane part of cell wall... released in large quantities during rapid bacterial growth or bacterial lysis and death.' (Gram-negative Rods Handout, Page 1-2)"
+        },
+        {
+            learningObjective: "LO3 (Gram-negative Rods): Outline the defining characteristics of Enterobacteriaceae",
+            question: "A bacterium isolated from a stool sample is a Gram-negative rod. Which of the following biochemical characteristics would strongly suggest it belongs to the family Enterobacteriaceae?",
+            options: { A: "It is oxidase-positive.", B: "It is an obligate anaerobe.", C: "It does not ferment glucose.", D: "It reduces nitrate to nitrite.", E: "It requires X and V factors for growth." },
+            correctAnswer: "D",
+            rationale: "Members of the Enterobacteriaceae family share several key biochemical traits: they are facultative anaerobes, they all ferment glucose, they are oxidase-negative, and almost all of them reduce nitrate to nitrite.",
+            source: "'Almost all reduce nitrate to nitrite (NO3- + 2e- + 2H+ → NO2-+ H2O).' (Gram-negative Rods Handout, Page 3)"
+        },
+        {
+            learningObjective: "LO3 (Gram-negative Rods): Outline the defining characteristics of Enterobacteriaceae",
+            question: "The oxidase test is a critical step in the identification of Gram-negative rods. The family Enterobacteriaceae is characteristically oxidase-negative. This is because they lack which specific component in their electron transport chain?",
+            options: { A: "Cytochrome bd", B: "ATP synthase", C: "Cytochrome c oxidase", D: "FAD", E: "Ubiquinone" },
+            correctAnswer: "C",
+            rationale: "The oxidase test detects the presence of cytochrome c oxidase. Enterobacteriaceae lack this enzyme and instead use a different terminal oxidase (cytochrome bd). This distinguishes them from oxidase-positive organisms like Pseudomonas.",
+            source: "'Oxidase-negative (ie. lack cytochrome c oxidase). a. Have a different cytochrome oxidase (cytochrome bd) to transfer electrons to O2.' (Gram-negative Rods Handout, Page 3)"
+        },
+        {
+            learningObjective: "LO3 (Gram-negative Rods): Outline the defining characteristics of Enterobacteriaceae",
+            question: "All members of the family Enterobacteriaceae are capable of fermenting which of the following carbohydrates?",
+            options: { A: "Lactose", B: "Sucrose", C: "Mannitol", D: "Glucose", E: "Sorbitol" },
+            correctAnswer: "D",
+            rationale: "While the ability to ferment other sugars like lactose is variable and used to differentiate genera, all Enterobacteriaceae ferment glucose. This is a defining characteristic that separates them from non-fermenting Gram-negative rods.",
+            source: "'All ferment glucose (as distinguished from “non-fermenters”).' (Gram-negative Rods Handout, Page 3)"
+        },
+        {
+            learningObjective: "LO4 (Gram-negative Rods): Describe selective media for Gram (-) bacteria",
+            question: "MacConkey agar is a selective and differential medium used for the isolation of Gram-negative rods. Its selective property, which inhibits the growth of most Gram-positive organisms, is due to the presence of:",
+            options: { A: "A high concentration of salt", B: "Lactose and a pH indicator", C: "Bile salts and crystal violet", D: "Sheep blood and antibiotics", E: "Egg yolk and tellurite" },
+            correctAnswer: "C",
+            rationale: "MacConkey agar contains bile salts and crystal violet, which are inhibitory to the growth of most Gram-positive bacteria, thus selecting for the growth of Gram-negative organisms.",
+            source: "'Contains nutrient broth for organism growth, bile salts & crystal violet to prevent the growth of Gram-positive organisms.' (Gram-negative Rods Handout, Page 6)"
+        },
+        {
+            learningObjective: "LO4 (Gram-negative Rods): Describe selective media for Gram (-) bacteria",
+            question: "On MacConkey agar, colonies of Escherichia coli appear pinkish-red, while colonies of Shigella dysenteriae are colorless. This differentiation is based on the organism's ability to ferment which sugar?",
+            options: { A: "Glucose", B: "Sucrose", C: "Maltose", D: "Mannitol", E: "Lactose" },
+            correctAnswer: "E",
+            rationale: "MacConkey agar contains lactose as the sole carbohydrate. Organisms that can ferment lactose produce acid, which lowers the pH around the colony. This causes the neutral red pH indicator to turn pink or red. Non-lactose fermenters do not produce acid, so the colonies remain colorless.",
+            source: "'Single sugar (lactose)... If an organism ferments lactose → red color in the colony. iii. Lactose-negative colonies colorless.' (Gram-negative Rods Handout, Page 6)"
+        },
+        {
+            learningObjective: "LO4 (Gram-negative Rods): Describe selective media for Gram (-) bacteria",
+            question: "A stool sample is plated on MacConkey agar. After incubation, the plate shows numerous colorless colonies. This result indicates that the predominant Gram-negative bacteria in the sample are:",
+            options: { A: "Lactose fermenters", B: "Gram-positive cocci", C: "Non-lactose fermenters", D: "Oxidase-positive", E: "Anaerobic" },
+            correctAnswer: "C",
+            rationale: "The absence of color change on MacConkey agar signifies that the bacteria are not fermenting the lactose in the medium. This is a key characteristic used to differentiate non-lactose fermenters (like Salmonella, Shigella, Proteus) from lactose fermenters (like E. coli, Klebsiella).",
+            source: "'Lactose-negative colonies colorless.' (Gram-negative Rods Handout, Page 6)"
+        },
+        {
+            learningObjective: "LO5 (Gram-negative Rods): Distinguish the laboratory characteristics of E. coli from Pseudomonas aeruginosa",
+            question: "A Gram-negative rod is isolated from a patient's wound. The organism produces a blue-green pigment (pyocyanin) and has a grape-like odor. It is also oxidase-positive. These characteristics are highly indicative of which organism?",
+            options: { A: "Escherichia coli", B: "Klebsiella pneumoniae", C: "Proteus mirabilis", D: "Pseudomonas aeruginosa", E: "Serratia marcescens" },
+            correctAnswer: "D",
+            rationale: "Pseudomonas aeruginosa is a non-fermenter that is oxidase-positive. It is well-known for producing pyocyanin, a blue-green pigment, and often has a characteristic grape-like or corn-taco-like odor. E. coli is a lactose-fermenting, oxidase-negative member of the Enterobacteriaceae.",
+            source: "'Oxidase-positive (grape-like or corn-taco odor). Many strains → blue-green pigment (pyocyanin).' (Gram-negative Rods Handout, Page 4)"
+        },
+        {
+            learningObjective: "LO5 (Gram-negative Rods): Distinguish the laboratory characteristics of E. coli from Pseudomonas aeruginosa",
+            question: "Which of the following laboratory test results would be expected for Escherichia coli but not for Pseudomonas aeruginosa?",
+            options: { A: "Gram-negative rod morphology", B: "Oxidase-positive", C: "Growth on MacConkey agar", D: "Fermentation of lactose", E: "Motility" },
+            correctAnswer: "D",
+            rationale: "E. coli is a member of the Enterobacteriaceae and is a lactose fermenter, producing pink colonies on MacConkey agar. P. aeruginosa is a non-fermenter and will produce colorless colonies on MacConkey agar. Both are motile Gram-negative rods that grow on MacConkey agar, but P. aeruginosa is oxidase-positive while E. coli is oxidase-negative.",
+            source: "'Many common Enterobacteriaceae are lactose fermenters a. E. coli.' (Gram-negative Rods Handout, Page 6) and 'Pseudomonas aeruginosa. 1. Gram-negative aerobic, motile rod (non-fermenter of glucose & lactose).' (Gram-negative Rods Handout, Page 4)"
+        },
+        {
+            learningObjective: "LO5 (Gram-negative Rods): Distinguish the laboratory characteristics of E. coli from Pseudomonas aeruginosa",
+            question: "A key test for differentiating Pseudomonas aeruginosa from members of the Enterobacteriaceae family is the oxidase test. What result would be expected for each?",
+            options: { A: "Both are oxidase-positive", B: "Both are oxidase-negative", C: "P. aeruginosa is positive; E. coli is negative", D: "P. aeruginosa is negative; E. coli is positive", E: "The test is not applicable to these organisms" },
+            correctAnswer: "C",
+            rationale: "The presence of cytochrome c oxidase (detected by the oxidase test) is a fundamental difference. Pseudomonas aeruginosa is oxidase-positive. All members of the Enterobacteriaceae, including E. coli, are oxidase-negative.",
+            source: "'Pseudomonas aeruginosa... 2. Oxidase-positive.' (Gram-negative Rods Handout, Page 4) and 'Enterobacteriaceae... 3. Oxidase-negative (ie. lack cytochrome c oxidase).' (Gram-negative Rods Handout, Page 3)"
+        },
+        {
+            learningObjective: "LO6 (Gram-negative Rods): Describe the significance of cytochrome oxidase in Gram (-) bacteria",
+            question: "The presence of cytochrome c oxidase, detected by the oxidase test, indicates that a bacterium utilizes a specific type of electron transport chain. Organisms that are oxidase-positive, such as Pseudomonas, are typically:",
+            options: { A: "Obligate anaerobes", B: "Facultative anaerobes that cannot use oxygen", C: "Aerobes or facultative anaerobes that can use oxygen as a terminal electron acceptor", D: "Unable to grow on MacConkey agar", E: "Lactose fermenters" },
+            correctAnswer: "C",
+            rationale: "Cytochrome c oxidase is a key component of the aerobic respiratory chain in many organisms. Its presence implies that the bacterium can use oxygen as the final electron acceptor in its energy production pathway. Enterobacteriaceae, which are oxidase-negative, are facultative anaerobes but use a different terminal oxidase.",
+            source: "'Enterobacteriaceae... Have a different cytochrome oxidase (cytochrome bd) to transfer electrons to O2.' (Gram-negative Rods Handout, Page 3) versus the implication for Pseudomonas on Slide 24 of the slides, which shows cytochrome c."
+        },
+        {
+            learningObjective: "LO6 (Gram-negative Rods): Describe the significance of cytochrome oxidase in Gram (-) bacteria",
+            question: "A microbiology laboratory receives a sample from a urinary tract infection. The Gram stain shows a Gram-negative rod. The technologist performs an oxidase test, and the result is negative. This result makes it highly likely that the causative organism belongs to which family?",
+            options: { A: "Pseudomonadaceae", B: "Enterobacteriaceae", C: "Neisseriaceae", D: "Vibrionaceae", E: "Campylobacteraceae" },
+            correctAnswer: "B",
+            rationale: "A negative oxidase test is a defining characteristic of the family Enterobacteriaceae. This simple test is one of the first steps used to differentiate this large, clinically important family from other Gram-negative rods like Pseudomonas, which are oxidase-positive.",
+            source: "'Enterobacteriaceae... Oxidase-negative (ie. lack cytochrome c oxidase).' (Gram-negative Rods Handout, Page 3)"
+        },
+        {
+            learningObjective: "LO6 (Gram-negative Rods): Describe the significance of cytochrome oxidase in Gram (-) bacteria",
+            question: "Which of the following organisms is characteristically oxidase-positive?",
+            options: { A: "Escherichia coli", B: "Klebsiella pneumoniae", C: "Proteus mirabilis", D: "Pseudomonas aeruginosa", E: "Shigella sonnei" },
+            correctAnswer: "D",
+            rationale: "Pseudomonas aeruginosa is a classic example of an oxidase-positive, non-fermenting Gram-negative rod. All the other options are members of the Enterobacteriaceae family, which are characteristically oxidase-negative.",
+            source: "'Pseudomonas aeruginosa... Oxidase-positive.' (Gram-negative Rods Handout, Page 4)"
+        },
+        {
+            learningObjective: "LO7 (Gram-negative Rods): Identify the ecological habitats of Enterobacteriaceae, Pseudomonas, & Pseudomonas-like organisms, and anaerobic Gram (-) bacteria",
+            question: "A patient develops a urinary tract infection after being hospitalized. The causative organism is a Gram-negative rod that is a common inhabitant of the human gastrointestinal tract. Which family of bacteria is the most likely source of this opportunistic infection?",
+            options: { A: "Pseudomonadaceae", B: "Enterobacteriaceae", C: "Vibrionaceae", D: "Campylobacteraceae", E: "Spirochaetaceae" },
+            correctAnswer: "B",
+            rationale: "Enterobacteriaceae, such as E. coli, are normal inhabitants of the mammalian gut. Due to the anatomical proximity of the GI tract to the urinary tract, these organisms are the most common cause of opportunistic UTIs.",
+            source: "'Other Enterobacteriaceae are opportunists. a. Gut bacteria can → UTI (proximity of feces to urinary tract).' (Gram-negative Rods Handout, Page 4)"
+        },
+        {
+            learningObjective: "LO7 (Gram-negative Rods): Identify the ecological habitats of Enterobacteriaceae, Pseudomonas, & Pseudomonas-like organisms, and anaerobic Gram (-) bacteria",
+            question: "A patient with cystic fibrosis develops a chronic pulmonary infection with a Gram-negative rod known for forming biofilms and being a common inhabitant of soil and water, particularly in moist hospital environments. Which organism is notorious for this type of infection?",
+            options: { A: "Salmonella enterica", B: "Shigella dysenteriae", C: "Pseudomonas aeruginosa", D: "Yersinia pestis", E: "Proteus mirabilis" },
+            correctAnswer: "C",
+            rationale: "Pseudomonas aeruginosa is a ubiquitous environmental organism found in soil and water. It thrives in moist environments and is a major opportunistic pathogen, especially in hospitals and in patients with compromised lung function, such as those with cystic fibrosis.",
+            source: "'Common inhabitant of soil & water (present in moist environments in hospitals). Important hospital pathogen (compromised host).' (Gram-negative Rods Handout, Page 5)"
+        },
+        {
+            learningObjective: "LO7 (Gram-negative Rods): Identify the ecological habitats of Enterobacteriaceae, Pseudomonas, & Pseudomonas-like organisms, and anaerobic Gram (-) bacteria",
+            question: "A patient develops a foul-smelling abscess following abdominal surgery. A Gram stain of the purulent material reveals a mixed population of bacteria, including numerous Gram-negative rods. The infection is likely to involve organisms whose natural habitat is the colon and which thrive in the absence of oxygen. This describes which group of bacteria?",
+            options: { A: "Non-fermenters", B: "Enterobacteriaceae", C: "Anaerobic Gram-negative bacilli", D: "Gram-positive cocci", E: "Mycobacteria" },
+            correctAnswer: "C",
+            rationale: "Anaerobic bacteria, particularly Gram-negative bacilli like Bacteroides spp., are the predominant organisms in the colon, outnumbering aerobes significantly. They are common causes of intra-abdominal abscesses, which are often polymicrobial and have a characteristic malodor.",
+            source: "'Anaerobic bacteria outnumber aerobes in virtually every body location (10 to 1 on skin;1000 to 1 in the colon).' and 'Often encountered in... intraabdominal infections.' (Gram-negative Rods Handout, Page 7)"
+        },
+        {
+            learningObjective: "LO8 (Gram-negative Rods): Describe the human microbiome",
+            question: "The human microbiome is the collection of all microorganisms residing on and within the human body. In the colon, the microbial population is vast and dense. Which of the following statements is true regarding the colonic microbiome?",
+            options: { A: "Aerobic bacteria outnumber anaerobic bacteria by a ratio of 100:1.", B: "The dominant species are typically Gram-positive cocci.", C: "Anaerobic bacteria outnumber aerobic bacteria by a ratio of approximately 1000:1.", D: "The microbiome is uniform throughout the entire gastrointestinal tract.", E: "It is primarily composed of fungi and viruses." },
+            correctAnswer: "C",
+            rationale: "The colon is a highly anaerobic environment. As such, anaerobic bacteria are far more numerous than aerobic or facultative anaerobic bacteria, with ratios estimated to be as high as 1000 to 1.",
+            source: "'Anaerobic bacteria outnumber aerobes in virtually every body location (10 to 1 on skin;1000 to 1 in the colon).' (Gram-negative Rods Handout, Page 7)"
+        },
+        {
+            learningObjective: "LO8 (Gram-negative Rods): Describe the human microbiome",
+            question: "The vast majority of bacteria that constitute the normal human gut flora, particularly in the colon, belong to which major group?",
+            options: { A: "Gram-positive cocci", B: "Gram-positive, spore-forming rods", C: "Gram-negative, lactose-fermenting aerobes", D: "Gram-negative, non-fermenting aerobes", E: "Gram-negative anaerobes" },
+            correctAnswer: "E",
+            rationale: "While facultative anaerobes like E. coli are well-known residents, the numerically dominant population of the colonic microbiome consists of strict anaerobes, particularly Gram-negative species from the phylum Bacteroidetes.",
+            source: "'dominant species: Bacteroidetes (Gram-negative anaerobes)' (Gram-negative Rods Slides, Slide 41)"
+        },
+        {
+            learningObjective: "LO8 (Gram-negative Rods): Describe the human microbiome",
+            question: "A patient with a ruptured appendix develops peritonitis. The resulting intra-abdominal abscess is likely to be polymicrobial. The foul odor often associated with such infections is a clue that which type of bacteria are present?",
+            options: { A: "Strictly aerobic bacteria", B: "Anaerobic bacteria", C: "Gram-positive cocci only", D: "Viruses", E: "Fungi" },
+            correctAnswer: "B",
+            rationale: "Anaerobic bacteria produce characteristic malodorous metabolic byproducts during fermentation. The presence of an extremely foul-smelling infection is a strong clinical clue for the involvement of anaerobes, which are abundant in the gut.",
+            source: "'Clues to anaerobic infection... b. Extreme malodor.' (Gram-negative Rods Handout, Page 7)"
+        },
+        // Gram-negative Cocci & Coccobacilli LOs
+        {
+            learningObjective: "LO1 (Gram-negative Cocci & Coccobacilli): Diagnose Gram-negative bacteria responsible for causing disease based on microbiologic characteristics: Neisseria meningitidis",
+            obfuscatedLO: "LO1 (Gram-negative Cocci & Coccobacilli): Diagnose Gram-negative bacteria responsible for causing disease based on microbiologic characteristics...",
+            question: "A Gram-negative diplococcus is isolated from the cerebrospinal fluid of a patient with meningitis. The organism ferments glucose and maltose and possesses a polysaccharide capsule. Which of the following is the most likely pathogen?",
+            options: { A: "Neisseria gonorrhoeae", B: "Moraxella catarrhalis", C: "Haemophilus influenzae", D: "Kingella kingae", E: "Neisseria meningitidis" },
+            correctAnswer: "E",
+            rationale: "The ability to ferment both glucose and maltose is a key biochemical characteristic that differentiates Neisseria meningitidis from Neisseria gonorrhoeae (which only ferments glucose) and Moraxella catarrhalis (which ferments neither). The presence of a capsule is also a major virulence factor for N. meningitidis.",
+            source: "'N. meningitidis... Glucose +, Maltose +, Capsule +' (Gram-negative Cocci & Coccobacilli Slides, Slide 4)"
+        },
+        {
+            learningObjective: "LO1 (Gram-negative Cocci & Coccobacilli): Diagnose Gram-negative bacteria responsible for causing disease based on microbiologic characteristics: Neisseria gonorrhoeae",
+            obfuscatedLO: "LO1 (Gram-negative Cocci & Coccobacilli): Diagnose Gram-negative bacteria responsible for causing disease based on microbiologic characteristics...",
+            question: "A culture from a urethral swab grows on Thayer-Martin agar, revealing Gram-negative diplococci. The organism ferments glucose but not maltose and lacks a capsule. This profile is characteristic of:",
+            options: { A: "Neisseria meningitidis", B: "Neisseria gonorrhoeae", C: "Moraxella catarrhalis", D: "Haemophilus influenzae", E: "Kingella kingae" },
+            correctAnswer: "B",
+            rationale: "Neisseria gonorrhoeae is a fastidious organism that requires enriched media like Thayer-Martin agar. It is distinguished from N. meningitidis by its inability to ferment maltose and its lack of a polysaccharide capsule.",
+            source: "'N. gonorrhoeae... Glucose +, Maltose -, Capsule -' (Gram-negative Cocci & Coccobacilli Slides, Slide 4)"
+        },
+        {
+            learningObjective: "LO1 (Gram-negative Cocci & Coccobacilli): Diagnose Gram-negative bacteria responsible for causing disease based on microbiologic characteristics: Haemophilus influenzae",
+            obfuscatedLO: "LO1 (Gram-negative Cocci & Coccobacilli): Diagnose Gram-negative bacteria responsible for causing disease based on microbiologic characteristics...",
+            question: "A Gram-negative coccobacillus is cultured from the sputum of a child with epiglottitis. The organism will not grow on standard blood agar but grows well on chocolate agar, which provides both hemin (X factor) and NAD (V factor). This growth requirement points to which pathogen?",
+            options: { A: "Bordetella pertussis", B: "Moraxella catarrhalis", C: "Haemophilus influenzae", D: "Neisseria meningitidis", E: "Kingella kingae" },
+            correctAnswer: "C",
+            rationale: "Haemophilus influenzae is a fastidious organism that requires specific growth factors found in blood: X factor (hemin) and V factor (NAD). Chocolate agar, which is made of gently heated blood, releases these factors, allowing the organism to grow.",
+            source: "'Culture: X and V factor requirement' (Gram-negative Cocci & Coccobacilli Slides, Slide 34)"
+        },
+        {
+            learningObjective: "LO1 (Gram-negative Cocci & Coccobacilli): Diagnose Gram-negative bacteria responsible for causing disease based on microbiologic characteristics: Bordetella pertussis",
+            obfuscatedLO: "LO1 (Gram-negative Cocci & Coccobacilli): Diagnose Gram-negative bacteria responsible for causing disease based on microbiologic characteristics...",
+            question: "A nasopharyngeal swab from an infant with severe paroxysmal coughing is cultured on a special charcoal medium supplemented with horse blood (Regan-Lowe medium). This specialized medium is required for the isolation of which small, obligate pathogen?",
+            options: { A: "Haemophilus influenzae", B: "Bordetella pertussis", C: "Moraxella catarrhalis", D: "Neisseria gonorrhoeae", E: "Kingella kingae" },
+            correctAnswer: "B",
+            rationale: "Bordetella pertussis is a fastidious, obligate pathogen that requires specialized media for growth, such as Regan-Lowe or Bordet-Gengou agar. These media contain charcoal, starch, or blood to absorb toxic substances that inhibit its growth.",
+            source: "'Culture on Regan-Lowe charcoal medium supplemented with horse blood' (Gram-negative Cocci & Coccobacilli Slides, Slide 41)"
+        },
+        {
+            learningObjective: "LO1 (Gram-negative Cocci & Coccobacilli): Diagnose Gram-negative bacteria responsible for causing disease based on microbiologic characteristics: Moraxella catarrhalis",
+            obfuscatedLO: "LO1 (Gram-negative Cocci & Coccobacilli): Diagnose Gram-negative bacteria responsible for causing disease based on microbiologic characteristics...",
+            question: "A Gram-negative diplococcus is isolated from the middle ear fluid of a child with otitis media. The organism is catalase and oxidase positive, but unlike Neisseria species, it does not utilize carbohydrates. This profile identifies which organism?",
+            options: { A: "Neisseria meningitidis", B: "Neisseria gonorrhoeae", C: "Haemophilus influenzae", D: "Moraxella catarrhalis", E: "Kingella kingae" },
+            correctAnswer: "D",
+            rationale: "Moraxella catarrhalis is biochemically distinguished from the pathogenic Neisseria species by its inability to utilize carbohydrates (asaccharolytic). It is a common cause of otitis media and sinusitis.",
+            source: "'Catalase and oxidase positive. Does not utilize carbohydrates.' (Gram-negative Cocci & Coccobacilli Slides, Slide 43)"
+        },
+        {
+            learningObjective: "LO1 (Gram-negative Cocci & Coccobacilli): Diagnose Gram-negative bacteria responsible for causing disease based on microbiologic characteristics: Kingella kingae",
+            obfuscatedLO: "LO1 (Gram-negative Cocci & Coccobacilli): Diagnose Gram-negative bacteria responsible for causing disease based on microbiologic characteristics...",
+            question: "A Gram-negative coccobacillus that arranges in pairs and short chains is isolated from the joint fluid of a toddler with septic arthritis. The organism is oxidase-positive, and most isolates are beta-lactamase negative. Which pathogen fits this description?",
+            options: { A: "Haemophilus influenzae", B: "Moraxella catarrhalis", C: "Bordetella pertussis", D: "Kingella kingae", E: "Neisseria meningitidis" },
+            correctAnswer: "D",
+            rationale: "Kingella kingae is a Gram-negative coccobacillus that is oxidase-positive. It is a significant cause of osteoarticular infections in young children. It can be difficult to culture, and most strains remain susceptible to penicillin as they are beta-lactamase negative.",
+            source: "'Arranges in pairs & short chains. Oxidase +. Most isolates are beta-lactamase negative.' (Gram-negative Cocci & Coccobacilli Slides, Slide 47)"
+        },
+        {
+            learningObjective: "LO2 (Gram-negative Cocci & Coccobacilli): Identify causative organisms based on location of infection and basic epidemiologic features",
+            question: "A 19-year-old college student living in a dormitory presents with fever, severe headache, stiff neck, and a petechial rash. Which organism is a primary consideration given this clinical and epidemiological context?",
+            options: { A: "Haemophilus influenzae", B: "Streptococcus pneumoniae", C: "Neisseria meningitidis", D: "Listeria monocytogenes", E: "Kingella kingae" },
+            correctAnswer: "C",
+            rationale: "Neisseria meningitidis is a leading cause of bacterial meningitis, particularly in adolescents and young adults living in close quarters like college dorms or military barracks. The presence of a petechial rash with meningitis is highly suggestive of meningococcemia.",
+            source: "'Epidemiology of Meningococcal Disease... Prevalence of carriage: ~10%... 25% in teenagers.' (Gram-negative Cocci & Coccobacilli Slides, Slide 18)"
+        },
+        {
+            learningObjective: "LO2 (Gram-negative Cocci & Coccobacilli): Identify causative organisms based on location of infection and basic epidemiologic features",
+            question: "A sexually active 22-year-old male presents with a purulent urethral discharge and dysuria. A Gram stain of the discharge reveals intracellular Gram-negative diplococci. What is the most likely causative organism?",
+            options: { A: "Chlamydia trachomatis", B: "Ureaplasma urealyticum", C: "Haemophilus ducreyi", D: "Neisseria gonorrhoeae", E: "Treponema pallidum" },
+            correctAnswer: "D",
+            rationale: "Gonorrhea, caused by Neisseria gonorrhoeae, is a very common STI. The classic presentation in men is acute urethritis with a purulent discharge. The microscopic finding of Gram-negative diplococci within neutrophils is diagnostic.",
+            source: "'Pathogenesis & Clinical Manifestations... Men: Urethritis.' (Gram-negative Cocci & Coccobacilli Slides, Slide 8)"
+        },
+        {
+            learningObjective: "LO2 (Gram-negative Cocci & Coccobacilli): Identify causative organisms based on location of infection and basic epidemiologic features",
+            question: "An unvaccinated 3-year-old child presents with an abrupt onset of high fever, dysphagia, drooling, and respiratory distress, adopting a 'tripod' position to breathe. This presentation is a medical emergency characteristic of epiglottitis, historically caused by which organism?",
+            options: { A: "Bordetella pertussis", B: "Moraxella catarrhalis", C: "Neisseria meningitidis", D: "Haemophilus influenzae", E: "Streptococcus pyogenes" },
+            correctAnswer: "D",
+            rationale: "Acute epiglottitis was classically caused by Haemophilus influenzae type b (Hib) before the widespread use of the Hib vaccine. Although now rare, it remains the classic association for this clinical picture of rapid airway obstruction.",
+            source: "'Pathogenesis & Diseases... From nasopharynx H. flu spreads to: ...epiglottis ⇨ epiglottitis.' (Gram-negative Cocci & Coccobacilli Slides, Slide 31)"
+        },
+        {
+            learningObjective: "LO3 (Gram-negative Cocci & Coccobacilli): Summarize treatment and prevention of infections caused by Neisseria species",
+            question: "A 25-year-old is diagnosed with uncomplicated gonococcal urethritis. Due to widespread resistance and the high likelihood of co-infection, what is the recommended treatment regimen?",
+            options: { A: "A single dose of oral penicillin", B: "A single intramuscular dose of ceftriaxone plus oral doxycycline or azithromycin", C: "A 7-day course of oral tetracycline only", D: "A single dose of oral ciprofloxacin", E: "A 10-day course of amoxicillin" },
+            correctAnswer: "B",
+            rationale: "Current treatment guidelines for gonorrhea recommend a single high dose of parenteral ceftriaxone due to widespread resistance to other classes of antibiotics. Additionally, because co-infection with Chlamydia trachomatis is common, treatment typically includes an agent effective against it, such as tetracycline (or doxycycline/azithromycin).",
+            source: "'Ceftriaxone Parenteral (IM or IV). Mixed infection with Chlamydia trachomatis: Add tetracycline.' (Gram-negative Cocci & Coccobacilli Slides, Slide 15)"
+        },
+        {
+            learningObjective: "LO3 (Gram-negative Cocci & Coccobacilli): Summarize treatment and prevention of infections caused by Neisseria species",
+            question: "A college freshman is required to receive a vaccination prior to moving into the dormitory to protect against a common cause of epidemic meningitis. The standard quadrivalent vaccine provides protection against which serogroups of Neisseria meningitidis?",
+            options: { A: "Serogroup B only", B: "Serogroups A, C, Y, and W", C: "Serogroups X and Z", D: "All 13 known serogroups", E: "Serogroups C and Y only" },
+            correctAnswer: "B",
+            rationale: "The conjugate quadrivalent meningococcal vaccines (e.g., Menactra, Menveo) are routinely recommended for adolescents and target the four most common serogroups associated with invasive disease in the US and globally: A, C, Y, and W. A separate vaccine is required for serogroup B.",
+            source: "'Quadrivalent Polysaccharide-protein conjugate vaccine (e.g., polysaccharide-diphtheria toxoid): A, C, Y, W serogroups.' (Gram-negative Cocci & Coccobacilli Slides, Slide 24)"
+        },
+        {
+            learningObjective: "LO3 (Gram-negative Cocci & Coccobacilli): Summarize treatment and prevention of infections caused by Neisseria species",
+            question: "A healthcare worker has a significant exposure to the respiratory secretions of a patient with confirmed meningococcal meningitis. To prevent the development of disease, chemoprophylaxis is recommended. Which of the following is a preferred antibiotic for this purpose?",
+            options: { A: "Penicillin", B: "Vancomycin", C: "Metronidazole", D: "Rifampin", E: "Amoxicillin" },
+            correctAnswer: "D",
+            rationale: "Rifampin is one of the primary agents recommended for chemoprophylaxis for close contacts of patients with invasive meningococcal disease. It is effective at eradicating nasopharyngeal carriage of the organism. Ciprofloxacin and ceftriaxone are also options.",
+            source: "'Preferred is rifampin, 600mg twice daily orally for 2 days for adults.' (Gram-negative Cocci & Coccobacilli Slides, Slide 25)"
+        },
+        {
+            learningObjective: "LO4 (Gram-negative Cocci & Coccobacilli): Recognize virulence factors and pathogenesis of disease for the organisms discussed",
+            question: "A key virulence factor for Neisseria gonorrhoeae is a surface protein that prevents the fusion of the phagosome with the lysosome within neutrophils, allowing the bacteria to survive intracellularly. Which protein is responsible for this?",
+            options: { A: "Pili", B: "IgA protease", C: "Por protein", D: "Lipid A", E: "Opa protein" },
+            correctAnswer: "C",
+            rationale: "The Por protein (porin) of N. gonorrhoeae is a major outer membrane protein that, in addition to forming channels, can insert into host cell membranes and prevent phagolysosomal fusion. This is a critical mechanism for intracellular survival and immune evasion.",
+            source: "'Por protein => prevention of phagolysosomal fusion.' (Gram-negative Cocci & Coccobacilli Slides, Slide 5)"
+        },
+        {
+            learningObjective: "LO4 (Gram-negative Cocci & Coccobacilli): Recognize virulence factors and pathogenesis of disease for the organisms discussed",
+            question: "The pathogenesis of whooping cough involves the attachment of Bordetella pertussis to ciliated respiratory epithelial cells, followed by the production of toxins that cause local damage and systemic effects. Which toxin inactivates the inhibitory G-protein (Gai), leading to a massive increase in intracellular cAMP?",
+            options: { A: "Tracheal cytotoxin", B: "Adenylate cyclase toxin", C: "Dermonecrotic toxin", D: "Pertussis toxin", E: "Filamentous hemagglutinin" },
+            correctAnswer: "D",
+            rationale: "Pertussis toxin is an A-B toxin that ADP-ribosylates and inactivates the inhibitory G-protein, Gαi. This uncouples the G-protein from its receptor, leading to constitutive activity of adenylate cyclase and a dramatic increase in cAMP levels, which causes increased mucus secretion and lymphocytosis.",
+            source: "'Pertussis toxin inactivates Gai, the inhibitory protein that controls adenylate cyclase activity => Adenylate cyclase⇧ => CAMP ⇧.' (Gram-negative Cocci & Coccobacilli Slides, Slide 39)"
+        },
+        {
+            learningObjective: "LO4 (Gram-negative Cocci & Coccobacilli): Recognize virulence factors and pathogenesis of disease for the organisms discussed",
+            question: "The polysaccharide capsule is a critical virulence factor for both Neisseria meningitidis and encapsulated strains of Haemophilus influenzae. What is the primary function of this capsule in pathogenesis?",
+            options: { A: "To mediate attachment to epithelial cells", B: "To cause septic shock", C: "To resist phagocytosis by immune cells", D: "To acquire iron from the host", E: "To cause antigenic variation" },
+            correctAnswer: "C",
+            rationale: "The polysaccharide capsule is a major anti-phagocytic virulence factor. Its hydrophilic and negatively charged surface prevents efficient engulfment by phagocytes like neutrophils and macrophages, allowing the bacteria to survive and replicate in the bloodstream and CSF.",
+            source: "'N. meningitidis: HYI Major Virulence Factors. Capsule: Virulence factor.' (Gram-negative Cocci & Coccobacilli Slides, Slide 16) and 'H. influenzae Virulence Factors... Capsule: Virulence factor.' (Slide 28)"
+        },
+        {
+            learningObjective: "LO5 (Gram-negative Cocci & Coccobacilli): Recognize the efficacy and limitations of vaccination to prevent infections caused by some of the organisms discussed",
+            question: "The introduction of a conjugate vaccine against Haemophilus influenzae type b (Hib) in the late 1980s had a profound impact on the epidemiology of which pediatric disease?",
+            options: { A: "Gonorrhea", B: "Whooping cough", C: "Bacterial meningitis", D: "Otitis media", E: "Septic arthritis" },
+            correctAnswer: "C",
+            rationale: "Prior to the vaccine, Hib was the leading cause of bacterial meningitis in children under 5 years old. The conjugate vaccine has been incredibly effective, reducing the incidence of invasive Hib disease, including meningitis and epiglottitis, by over 99% in countries with routine vaccination programs.",
+            source: "'Decreased dramatically due to Hib vaccine.' (Gram-negative Cocci & Coccobacilli Slides, Slide 29)"
+        },
+        {
+            learningObjective: "LO5 (Gram-negative Cocci & Coccobacilli): Recognize the efficacy and limitations of vaccination to prevent infections caused by some of the organisms discussed",
+            question: "A significant challenge in developing a broadly effective vaccine against Neisseria meningitidis has been Serogroup B. Why is the capsular polysaccharide of Serogroup B a poor vaccine antigen?",
+            options: { A: "It is structurally identical to a human self-antigen.", B: "It undergoes rapid antigenic variation.", C: "It is not expressed during invasive disease.", D: "It is a lipid, not a polysaccharide.", E: "It is only produced in adolescents." },
+            correctAnswer: "A",
+            rationale: "The capsular polysaccharide of N. meningitidis serogroup B is composed of polysialic acid, which is structurally identical to a carbohydrate moiety found on human neural cell adhesion molecules (NCAM). Because it is seen as 'self' by the immune system, it is poorly immunogenic and carries a risk of inducing autoimmunity, making it unsuitable for a traditional conjugate vaccine.",
+            source: "While not explicitly stated in the slides, this is a core concept of meningococcal vaccinology. The slides do state the monovalent serogroup B vaccine is 'Poorly efficacious' (Slide 24), which is a direct consequence of this immunological challenge."
+        },
+        {
+            learningObjective: "LO5 (Gram-negative Cocci & Coccobacilli): Recognize the efficacy and limitations of vaccination to prevent infections caused by some of the organisms discussed",
+            question: "The current vaccine for pertussis used in the United States is the DTaP vaccine. The 'aP' component stands for 'acellular pertussis'. What is a major advantage of the acellular vaccine over the older whole-cell vaccines?",
+            options: { A: "It provides lifelong immunity with a single dose.", B: "It is a live attenuated vaccine.", C: "It has a lower incidence of adverse reactions like fever and local swelling.", D: "It is effective against all species of Bordetella.", E: "It is significantly cheaper to produce." },
+            correctAnswer: "C",
+            rationale: "The older whole-cell pertussis vaccines were effective but were associated with a higher rate of adverse effects, both local (pain, swelling) and systemic (fever, irritability). The acellular vaccine uses purified components of the bacterium (like pertussis toxoid) and has a much better safety profile with fewer side effects, which has improved public acceptance.",
+            source: "'aP: Acellular. Five Antigens (Genetically modified pertussis toxoid etc.)' (Gram-negative Cocci & Coccobacilli Slides, Slide 42). The move to an acellular (purified component) vaccine is universally understood in medicine to be a move toward improved safety and tolerability."
+        },
+        // NTM and Actinomycetes LOs
+        {
+            learningObjective: "LO1 (NTM): Differentiate mycobacteria and actinomycytes from other bacteria...",
+            question: "A sputum sample from a patient with a chronic cough is stained using the Ziehl-Neelsen method. The microscopist observes red, rod-shaped organisms against a blue background. This staining characteristic, known as acid-fastness, is due to the high concentration of what substance in the cell wall?",
+            options: { A: "Peptidoglycan", B: "Lipopolysaccharide", C: "Teichoic acid", D: "Mycolic acids", E: "Chitin" },
+            correctAnswer: "D",
+            rationale: "Mycobacteria have a complex, lipid-rich cell wall that contains a high percentage of mycolic acids. These long-chain fatty acids form a waxy, hydrophobic layer that prevents decolorization by acid-alcohol after being stained with carbol fuchsin, hence the term 'acid-fast'.",
+            source: "'Mycobacteria are classified as such based on: (1) Their acid-fastness (2) Presence of mycolic acids containing 70-90 carbons.' (NTM Slides, Slide 3)"
+        },
+        {
+            learningObjective: "LO1 (NTM): Differentiate mycobacteria and actinomycytes from other bacteria...",
+            question: "A Gram stain of a sample from a lung abscess shows filamentous, branching, Gram-positive rods that appear beaded. A modified acid-fast stain is also positive. Which of the following organisms fits this description?",
+            options: { A: "Streptococcus pneumoniae", B: "Actinomyces israelii", C: "Nocardia asteroides", D: "Bacillus anthracis", E: "Mycobacterium tuberculosis" },
+            correctAnswer: "C",
+            rationale: "Nocardia species are Gram-positive, filamentous, branching bacteria. A key distinguishing feature is that they are also weakly or partially acid-fast. While Actinomyces are also filamentous and Gram-positive, they are not acid-fast. M. tuberculosis is strongly acid-fast but does not typically appear as branching filaments on a Gram stain.",
+            source: "'Nocardia organisms are aerobic Gram-positive, weakly acid-fast bacteria... Thin, filamentous, branching “hyphae”...' (NTM Slides, Slides 43 & 44)"
+        },
+        {
+            learningObjective: "LO1 (NTM): Differentiate mycobacteria and actinomycytes from other bacteria...",
+            question: "An organism is isolated from a patient's tap water and is found to produce a yellow pigment, but only after the culture plate is exposed to light. This organism is best classified as a:",
+            options: { A: "Scotochromogen", B: "Non-chromogen", C: "Rapid grower", D: "Photochromogen", E: "Non-grower" },
+            correctAnswer: "D",
+            rationale: "NTM are classified based on their growth rate and pigment production. Photochromogens are slow-growing mycobacteria that produce a yellow-orange pigment only when the culture is exposed to light. M. kansasii is the classic example.",
+            source: "'Photochromogens: M. kansasii, M. marinum • produce yellow pigment when exposed to the light.' (NTM Slides, Slide 13)"
+        },
+        {
+            learningObjective: "LO2 (NTM): Discuss the epidemiology, pathogenesis and clinical manifestations of non-tuberculous mycobacterial infections and nocardiosis.",
+            question: "A 65-year-old woman, a non-smoker with no prior lung disease, presents with a chronic cough. A chest CT shows nodular infiltrates and bronchiectasis, particularly in the lingula and right middle lobe. This clinical pattern is a classic presentation of pulmonary disease caused by which of the following organisms?",
+            options: { A: "Mycobacterium kansasii", B: "Nocardia asteroides", C: "Mycobacterium marinum", D: "Mycobacterium avium complex (MAC)", E: "Mycobacterium leprae" },
+            correctAnswer: "D",
+            rationale: "Pulmonary MAC infection has several clinical presentations. The nodular/bronchiectatic form is classically seen in elderly, female non-smokers and characteristically involves the lingula and right middle lobe.",
+            source: "'Lingular or middle lobe infiltrates with a patchy, nodular appearance on CXR & bronchiectasis: • Elderly, female non-smokers.' (NTM Slides, Slide 18)"
+        },
+        {
+            learningObjective: "LO2 (NTM): Discuss the epidemiology, pathogenesis and clinical manifestations of non-tuberculous mycobacterial infections and nocardiosis.",
+            question: "An immunocompromised patient develops a pulmonary infection that disseminates to the brain, causing a cerebral abscess. The organism is identified as a Gram-positive, weakly acid-fast, branching rod. What is the most likely causative agent?",
+            options: { A: "Mycobacterium avium complex", B: "Actinomyces israelii", C: "Nocardia asteroides", D: "Mycobacterium kansasii", E: "Listeria monocytogenes" },
+            correctAnswer: "C",
+            rationale: "Nocardia asteroides typically causes pulmonary infections in immunocompromised individuals. A hallmark of this infection is its tendency to disseminate hematogenously, with a strong predilection for the central nervous system, where it can cause brain abscesses.",
+            source: "'N. asteroides can disseminate from the lungs to CNS: • Cerebral abscess; lethargy, seizures, and neurologic deficits.' (NTM Slides, Slide 46)"
+        },
+        {
+            learningObjective: "LO2 (NTM): Discuss the epidemiology, pathogenesis and clinical manifestations of non-tuberculous mycobacterial infections and nocardiosis.",
+            question: "The primary mode of transmission for most non-tuberculous mycobacteria (NTM) causing pulmonary disease is:",
+            options: { A: "Person-to-person respiratory droplets", B: "Contact with infected animals", C: "Ingestion of contaminated food", D: "Inhalation from environmental sources like water and soil", E: "Vector-borne transmission by insects" },
+            correctAnswer: "D",
+            rationale: "Unlike Mycobacterium tuberculosis, NTM are not typically transmitted from person to person. They are ubiquitous environmental organisms, and infections are acquired from exposure to these sources, primarily through inhalation of aerosols from water or soil.",
+            source: "'Ubiquitous: soil, water (primary mode of transmission), dust, and domestic animals.' (NTM Slides, Slide 17)"
+        },
+        {
+            learningObjective: "LO3 (NTM): Discuss the role of cell-mediated immunity in control of NTM infection. Recognize granulomatous inflammation as the histopathological hallmark of NTM infection.",
+            question: "A patient with a genetic mutation in the IL-12 receptor is found to have a severe, disseminated non-tuberculous mycobacterial (NTM) infection. The increased susceptibility in this patient is due to the failure of which critical step in the cell-mediated immune response?",
+            options: { A: "Antibody production by B-cells", B: "Activation of macrophages by Th1 cells", C: "Formation of membrane attack complex by complement", D: "Degranulation of mast cells", E: "Neutrophil chemotaxis" },
+            correctAnswer: "B",
+            rationale: "The IL-12/IFN-γ axis is crucial for controlling mycobacterial infections. Macrophages phagocytose mycobacteria and produce IL-12. IL-12 stimulates Th1 cells to produce IFN-γ. IFN-γ is the primary signal that activates macrophages to kill the intracellular bacteria. A defect in this loop leads to uncontrolled infection.",
+            source: "'Positive IFN-γ & IL-12 feedback loop is critical for NTM control.' and 'IL-12 ⇧ IFN-γ by Th1 cells ⇨ Activation of macrophages.' (NTM Slides, Slide 10)"
+        },
+        {
+            learningObjective: "LO3 (NTM): Discuss the role of cell-mediated immunity in control of NTM infection. Recognize granulomatous inflammation as the histopathological hallmark of NTM infection.",
+            question: "A lung biopsy from a patient with a suspected NTM infection is examined. The pathologist notes organized collections of activated macrophages (epithelioid histiocytes), often surrounded by a cuff of lymphocytes and frequently containing multinucleated giant cells. What is this characteristic inflammatory pattern called?",
+            options: { A: "Suppurative inflammation", B: "Fibrinous inflammation", C: "Serous inflammation", D: "Granulomatous inflammation", E: "Ulcerative inflammation" },
+            correctAnswer: "D",
+            rationale: "Granulomatous inflammation is the histopathological hallmark of the host's attempt to 'wall off' persistent pathogens that are difficult to eliminate, such as mycobacteria. It is a form of chronic inflammation characterized by aggregates of activated macrophages.",
+            source: "'Immune Response: Granulomatous Inflammation.' (NTM Slides, Slide 10)"
+        },
+        {
+            learningObjective: "LO3 (NTM): Discuss the role of cell-mediated immunity in control of NTM infection. Recognize granulomatous inflammation as the histopathological hallmark of NTM infection.",
+            question: "A specific type of multinucleated giant cell, often seen in the granulomas of mycobacterial infections, is characterized by its nuclei being arranged in a horseshoe or arc pattern at the periphery of the cell. What is this cell called?",
+            options: { A: "Touton giant cell", B: "Foreign-body giant cell", C: "Aschoff giant cell", D: "Langhans giant cell", E: "Reed-Sternberg cell" },
+            correctAnswer: "D",
+            rationale: "Langhans giant cells are a characteristic feature of granulomas, particularly those associated with tuberculosis and other mycobacterial infections. They are formed by the fusion of epithelioid macrophages.",
+            source: "'Multinucleated Giant cells w. Nuclei arranged like arcs. AKA Langhans cells.' (NTM Slides, Slide 11)"
+        },
+        {
+            learningObjective: "LO4 (NTM): Recognize clinical manifestations and diagnostic features of M. kansasii and M. avium complex (MAC) infections.",
+            obfuscatedLO: "LO4 (NTM): Recognize clinical manifestations and diagnostic features of specific NTM infections.",
+            question: "An elderly man with a history of COPD and smoking presents with a chronic pulmonary disease that closely resembles tuberculosis, including upper lobe cavitation on chest X-ray. The causative organism is a slow-growing photochromogen commonly isolated from tap water. What is the most likely pathogen?",
+            options: { A: "Mycobacterium avium complex (MAC)", B: "Mycobacterium abscessus", C: "Mycobacterium kansasii", D: "Nocardia asteroides", E: "Mycobacterium tuberculosis" },
+            correctAnswer: "C",
+            rationale: "Mycobacterium kansasii characteristically causes a pulmonary disease that is clinically and radiographically very similar to tuberculosis, often with a predilection for the right upper lobe and cavitation. It is a slow-growing photochromogen and is frequently found in municipal tap water.",
+            source: "'M. kansasii Lung Disease... Clinical findings: Nota bene! • Most like TB • Right upper lobe predilection • Cavitation (90%).' (NTM Slides, Slide 21)"
+        },
+        {
+            learningObjective: "LO4 (NTM): Recognize clinical manifestations and diagnostic features of M. kansasii and M. avium complex (MAC) infections.",
+            obfuscatedLO: "LO4 (NTM): Recognize clinical manifestations and diagnostic features of specific NTM infections.",
+            question: "A patient with advanced AIDS (CD4 count of 35 cells/μL) develops fever, night sweats, weight loss, and diarrhea. Blood cultures grow an acid-fast bacillus. This disseminated infection in a severely immunocompromised host is most commonly caused by which of the following?",
+            options: { A: "Mycobacterium kansasii", B: "Mycobacterium leprae", C: "Nocardia asteroides", D: "Mycobacterium avium complex (MAC)", E: "Mycobacterium marinum" },
+            correctAnswer: "D",
+            rationale: "Disseminated MAC infection is a classic opportunistic infection in patients with AIDS, typically occurring when the CD4+ T-cell count falls below 50/μL. It presents as a systemic febrile illness and is a major cause of morbidity.",
+            source: "'Disseminated NTM infections occur in patients with: • AIDS whose CD4+ T-cell count is < 50/μL.' and 'Cause disseminated infections in patients with AIDS, T-cell immunodeficiency, etc.' (NTM Slides, Slides 10 & 17)"
+        },
+        {
+            learningObjective: "LO5 (NTM): Correlate clinical manifestations of leprosy with the patient’s ability to mount a vigorous cell-mediated immune response.",
+            question: "A patient with leprosy has numerous, symmetric, nodular skin lesions (leonine facies), a high number of acid-fast bacilli found in tissue biopsies ('multibacillary'), and a negative lepromin skin test. This clinical presentation corresponds to which form of leprosy and what type of immune response?",
+            options: { A: "Tuberculoid leprosy; strong cell-mediated immunity", B: "Lepromatous leprosy; weak cell-mediated immunity", C: "Tuberculoid leprosy; strong humoral immunity", D: "Lepromatous leprosy; strong cell-mediated immunity", E: "Borderline leprosy; mixed immune response" },
+            correctAnswer: "B",
+            rationale: "Lepromatous leprosy (LL) represents the pole of the disease spectrum with a weak or absent cell-mediated (Th1) immune response. This allows for uncontrolled bacterial proliferation, leading to high bacillary loads (multibacillary), numerous lesions, and anergy to M. leprae antigens (negative lepromin test). The immune response is skewed towards a non-protective Th2 (humoral) response.",
+            source: "'Lepromatous (LL): HYI • Absent cell-mediated immune response' and 'Associated with a weak TH1 response and upregulated TH2 response ⇨ weak cell-mediated immunity ⇨ high # of organisms.' (NTM Slides, Slides 31 & 37)"
+        },
+        {
+            learningObjective: "LO5 (NTM): Correlate clinical manifestations of leprosy with the patient’s ability to mount a vigorous cell-mediated immune response.",
+            question: "A patient presents with a few well-demarcated, anesthetic, hypopigmented skin lesions. A skin biopsy reveals granulomatous inflammation with very few acid-fast bacilli ('paucibacillary'). This patient likely has which form of leprosy, indicating a strong cell-mediated immune response?",
+            options: { A: "Lepromatous leprosy", B: "Borderline lepromatous leprosy", C: "Tuberculoid leprosy", D: "Indeterminate leprosy", E: "Histoid leprosy" },
+            correctAnswer: "C",
+            rationale: "Tuberculoid leprosy (TT) is characterized by a vigorous Th1-type cell-mediated immune response. This effective immune response contains the infection, resulting in a low number of organisms (paucibacillary), well-formed granulomas, and a limited number of skin lesions. The nerve damage is a result of the intense inflammation.",
+            source: "'Tuberculoid (TT): HYI • Vigorous cell-mediated immune response' and 'Pathology: Paucibacillary granulomatous inflammation.' (NTM Slides, Slides 31 & 32)"
+        },
+        {
+            learningObjective: "LO5 (NTM): Correlate clinical manifestations of leprosy with the patient’s ability to mount a vigorous cell-mediated immune response.",
+            question: "The outcome of an infection with Mycobacterium leprae is determined by the nature of the host's helper T-cell response. A strong Th1 response is associated with tuberculoid leprosy, while a weak Th1 response and an upregulated Th2 response are associated with which form of the disease?",
+            options: { A: "Paucibacillary leprosy", B: "Tuberculoid leprosy", C: "Borderline tuberculoid leprosy", D: "Lepromatous leprosy", E: "Indeterminate leprosy" },
+            correctAnswer: "D",
+            rationale: "The clinical spectrum of leprosy is a direct result of the host's immune response. A dominant Th2 response, which favors antibody production over macrophage activation, is ineffective at controlling the intracellular M. leprae. This leads to the uncontrolled bacterial growth and disseminated disease seen in lepromatous leprosy.",
+            source: "'Associated with a weak TH1 response and upregulated TH2 response ⇨ weak cell-mediated immunity ⇨ high # of organisms.' (NTM Slides, Slide 37)"
+        },
+        // Beta-Lactam & Other Cell Wall Antibiotics LOs
+        {
+            learningObjective: "LO1 (Beta-Lactam): Interpret various antimicrobial susceptibility testing results",
+            question: "A microbiology report for a bacterial isolate shows a Minimum Inhibitory Concentration (MIC) for ampicillin of 8 mg/L and an MIC for ceftriaxone of 0.5 mg/L. Based on the principle of antimicrobial selection, which statement is correct?",
+            options: { A: "Ceftriaxone should be chosen because it has the lower MIC.", B: "Ampicillin is eight times more potent than ceftriaxone.", C: "The choice of antibiotic depends on comparing each MIC to its specific breakpoint for that organism.", D: "Both antibiotics are equally effective.", E: "The antibiotic with the higher MIC is always preferred for sicker patients." },
+            correctAnswer: "C",
+            rationale: "The MIC value alone is not sufficient for selecting an antibiotic. The MIC must be interpreted in the context of the established breakpoint for that specific drug-bug combination. A drug with a lower MIC is not necessarily better if the breakpoint is also much lower. An organism is considered susceptible only if its MIC is at or below the breakpoint.",
+            source: "'#1. Do not choose an antimicrobial because it has the lowest MIC. Each microorganism-antibiotic combination has a set “breakpoint”' (Beta-Lactam Slides, Slide 10)"
+        },
+        {
+            learningObjective: "LO1 (Beta-Lactam): Interpret various antimicrobial susceptibility testing results",
+            question: "The Minimum Bactericidal Concentration (MBC) is determined after an MIC test. An antibiotic is generally considered bactericidal if:",
+            options: { A: "The MBC is equal to the MIC.", B: "The ratio of MBC to MIC is greater than 4.", C: "The ratio of MBC to MIC is less than or equal to 4.", D: "The MBC is significantly lower than the MIC.", E: "The concept is not clinically relevant." },
+            correctAnswer: "C",
+            rationale: "The classical teaching distinguishes between killing (bactericidal) and inhibiting (bacteriostatic). The laboratory definition of bactericidal activity is when the MBC (the concentration that kills 99.9% of the inoculum) is no more than four times the MIC (the concentration that inhibits growth).",
+            source: "'What they really are: - Bactericidal: MBC:MIC ≤ 4 - Bacteriostatic: MBC:MIC > 4' (Beta-Lactam Slides, Slide 8)"
+        },
+        {
+            learningObjective: "LO1 (Beta-Lactam): Interpret various antimicrobial susceptibility testing results",
+            question: "A laboratory reports the MIC of piperacillin-tazobactam for a Pseudomonas aeruginosa isolate as 16 mg/L. The established clinical breakpoint for susceptibility is ≤16 mg/L. How should this result be interpreted?",
+            options: { A: "Susceptible", B: "Intermediate", C: "Resistant", D: "The test is invalid", E: "Bacteriostatic" },
+            correctAnswer: "A",
+            rationale: "The interpretation of an MIC depends on comparing it to the established breakpoint. Since the organism's MIC of 16 mg/L is equal to (and not greater than) the breakpoint of ≤16 mg/L, it is categorized as susceptible, meaning the antibiotic is expected to be effective at standard doses.",
+            source: "'Each microorganism-antibiotic combination has a set “breakpoint”. All breakpoints are relative to concentrations achievable with a safe dose based on clinical data.' (Beta-Lactam Slides, Slide 10)"
+        },
+        {
+            learningObjective: "LO2 (Beta-Lactam): Explain the mechanism of activity of cell wall antimicrobials",
+            question: "Beta-lactam antibiotics exert their bactericidal effect by inhibiting the final step of peptidoglycan synthesis. What is the specific enzymatic process they block?",
+            options: { A: "Glycosylation", B: "Transpeptidation", C: "Phosphorylation", D: "Acetylation", E: "Isomerization" },
+            correctAnswer: "B",
+            rationale: "Beta-lactams bind to and inactivate penicillin-binding proteins (PBPs), which are bacterial enzymes (transpeptidases) responsible for cross-linking the peptide side chains of adjacent glycan strands in the cell wall. This inhibition of transpeptidation weakens the cell wall, leading to lysis.",
+            source: "'Bind to penicillin-binding proteins (PBP) -> Inhibit transpeptidation -> Block cell wall synthesis -> Cell lysis.' (Beta-Lactam Slides, Slide 12)"
+        },
+        {
+            learningObjective: "LO2 (Beta-Lactam): Explain the mechanism of activity of cell wall antimicrobials",
+            question: "The molecular targets of beta-lactam antibiotics are enzymes crucial for maintaining the integrity of the bacterial cell wall. What is the general name for these target enzymes?",
+            options: { A: "DNA gyrases", B: "RNA polymerases", C: "Ribosomal subunits", D: "Penicillin-binding proteins (PBPs)", E: "Beta-lactamases" },
+            correctAnswer: "D",
+            rationale: "Penicillin-binding proteins (PBPs) are the natural targets for beta-lactam antibiotics. They are a group of enzymes involved in the terminal stages of peptidoglycan synthesis. Beta-lactamases are enzymes that inactivate the antibiotics, not the targets of their action.",
+            source: "'Mechanism of action: Bind to penicillin-binding proteins which inhibit transpeptidation...' (Beta-Lactam Handout, Page 53)"
+        },
+        {
+            learningObjective: "LO2 (Beta-Lactam): Explain the mechanism of activity of cell wall antimicrobials",
+            question: "The structural feature common to all penicillins, cephalosporins, carbapenems, and monobactams that is essential for their antimicrobial activity is the:",
+            options: { A: "Thiazolidine ring", B: "Amide R1-side chain", C: "Dihydrothiazine ring", D: "Beta-lactam ring", E: "Carboxylic acid group" },
+            correctAnswer: "D",
+            rationale: "The four-membered beta-lactam ring is the core chemical structure of all beta-lactam antibiotics. Its strained chemical bonds are what allow it to covalently bind to and inactivate the penicillin-binding proteins.",
+            source: "'Penicillin Chemical Structure' diagram labels the central four-membered ring as the 'β-Lactam ring'. (Beta-Lactam Slides, Slide 13)"
+        },
+        {
+            learningObjective: "LO3 (Beta-Lactam): Identify adverse drug reactions associated with antimicrobials",
+            question: "A patient being treated with a carbapenem for a serious infection is also taking valproic acid for a seizure disorder. The physician should be aware of a significant drug interaction that can lead to:",
+            options: { A: "Increased risk of nephrotoxicity", B: "Increased levels of the carbapenem", C: "Decreased seizure threshold and breakthrough seizures", D: "A disulfiram-like reaction with alcohol", E: "Severe bone marrow suppression" },
+            correctAnswer: "C",
+            rationale: "Carbapenems can significantly decrease the serum concentration of valproic acid by inhibiting its hydrolysis and potentially increasing its glucuronidation. This can lead to subtherapeutic valproic acid levels and a loss of seizure control.",
+            source: "'Carbapenem Drug Interaction' diagram shows carbapenems inhibiting the hydrolysis of Valproic Acid Glucuronide back to Valproic Acid, effectively lowering levels of the active drug. (Beta-Lactam Slides, Slide 37)"
+        },
+        {
+            learningObjective: "LO3 (Beta-Lactam): Identify adverse drug reactions associated with antimicrobials",
+            question: "Cross-reactivity between penicillins and cephalosporins in a patient with a true penicillin allergy is a clinical concern. This cross-reactivity is most likely to occur when which part of the cephalosporin molecule is similar to that of the offending penicillin?",
+            options: { A: "The beta-lactam ring", B: "The dihydrothiazine ring", C: "The R1 side chain", D: "The R2 side chain", E: "The carboxylic acid group" },
+            correctAnswer: "C",
+            rationale: "While once thought to be related to the core beta-lactam ring, it is now understood that allergic cross-reactivity is primarily mediated by similarities in the R1 side chain. Cephalosporins with R1 side chains identical or very similar to penicillins (e.g., cephalexin and amoxicillin) have the highest risk of cross-reactivity.",
+            source: "'1. R1 side chain dictate antimicrobial activity and allergy-related cross-reactivity.' (Beta-Lactam Slides, Slide 25)"
+        },
+        {
+            learningObjective: "LO3 (Beta-Lactam): Identify adverse drug reactions associated with antimicrobials",
+            question: "A patient being treated with high-dose piperacillin-tazobactam for a hospital-acquired pneumonia develops a fever and a new rash. Laboratory workup is otherwise unremarkable. In addition to common adverse effects like GI intolerance, which of the following is a known risk associated with this agent?",
+            options: { A: "Severe neurotoxicity", B: "Ototoxicity", C: "Red man syndrome", D: "Acute kidney injury", E: "C. diff infection" },
+            correctAnswer: "E",
+            rationale: "Piperacillin-tazobactam is a broad-spectrum antibiotic that can significantly disrupt the normal gut flora. This disruption can lead to the overgrowth of Clostridioides difficile, resulting in C. diff infection and colitis, which can present with fever, diarrhea, and abdominal pain.",
+            source: "'Extended-Spectrum penicillins... Unique Adverse Drug Events: C. diff infection.' (Beta-Lactam Handout, Page 53)"
+        },
+        {
+            learningObjective: "LO4 (Beta-Lactam): Design an antimicrobial regimen for a patient based on risk factors and spectrum of activity",
+            question: "A 68-year-old man is scheduled for a hip replacement surgery. To prevent post-operative surgical site infections, which are often caused by skin flora like MSSA, which of the following is the most appropriate prophylactic antibiotic?",
+            options: { A: "Vancomycin", B: "Ceftriaxone", C: "Cefazolin", D: "Piperacillin-tazobactam", E: "Ampicillin" },
+            correctAnswer: "C",
+            rationale: "Cefazolin, a first-generation cephalosporin, is the drug of choice for most surgical prophylaxis. It has an excellent spectrum of activity against methicillin-susceptible Staphylococcus aureus (MSSA) and streptococci, the most common pathogens in skin-related surgical site infections, and has a favorable safety profile.",
+            source: "'1st Generation Cephalosporins... Cefazolin: IV only... Generally drug of choice for pre-operative prophylaxis.' (Beta-Lactam Slides, Slide 26)"
+        },
+        {
+            learningObjective: "LO4 (Beta-Lactam): Design an antimicrobial regimen for a patient based on risk factors and spectrum of activity",
+            question: "A critically ill patient in the ICU with a ventilator-associated pneumonia is found to have a multidrug-resistant Pseudomonas aeruginosa infection. Which of the following third-generation cephalosporins has specific activity against this pathogen?",
+            options: { A: "Ceftriaxone", B: "Cefpodoxime", C: "Cefdinir", D: "Ceftazidime", E: "Cefazolin" },
+            correctAnswer: "D",
+            rationale: "Among the third-generation cephalosporins, ceftazidime is unique in that it has potent activity against Pseudomonas aeruginosa. Ceftriaxone has excellent Gram-negative coverage but lacks reliable activity against Pseudomonas.",
+            source: "'3rd Generation Cephalosporins... Ceftazidime (IV)... Pseudomonas aeruginosa.' (Beta-Lactam Slides, Slide 28)"
+        },
+        {
+            learningObjective: "LO4 (Beta-Lactam): Design an antimicrobial regimen for a patient based on risk factors and spectrum of activity",
+            question: "A patient with a history of intravenous drug use presents with endocarditis. Blood cultures grow methicillin-susceptible Staphylococcus aureus (MSSA). What is the drug of choice for treating this infection?",
+            options: { A: "Vancomycin", B: "Penicillin G", C: "Nafcillin or Oxacillin", D: "Ceftaroline", E: "Ertapenem" },
+            correctAnswer: "C",
+            rationale: "For serious infections caused by MSSA, anti-staphylococcal penicillins like nafcillin or oxacillin are the drugs of choice. They are more effective than vancomycin for susceptible strains. Penicillin G is not used because most S. aureus produce penicillinase.",
+            source: "'Anti-Staphylococcal Penicillins... 1. Drug of choice for methicillin-susceptible Staphylococcus aureus.' (Beta-Lactam Slides, Slide 20)"
+        }
+    ];
+
+    const quizContainer = document.getElementById('quiz-container');
+    const themeToggleButton = document.getElementById('theme-toggle-button');
+    const bodyElement = document.body;
+
+    function applyTheme(theme) {
+        if (theme === 'light') {
+            bodyElement.classList.add('light-theme');
+            themeToggleButton.textContent = 'Switch to Dark Mode';
+        } else {
+            bodyElement.classList.remove('light-theme');
+            themeToggleButton.textContent = 'Switch to Light Mode';
+        }
+        localStorage.setItem('quizTheme', theme);
+    }
+
+    function loadQuiz() {
+        quizData.forEach((qData, index) => {
+            const questionBlock = document.createElement('div');
+            questionBlock.classList.add('question-block');
+            questionBlock.id = `q${index}`;
+
+            const loText = document.createElement('div');
+            loText.classList.add('learning-objective');
+            
+            // Store the full LO in a data attribute for later reveal
+            loText.dataset.fullLo = qData.learningObjective; 
+            
+            // Use the obfuscated version if it exists, otherwise use the full one
+            loText.innerHTML = qData.obfuscatedLO || qData.learningObjective; 
+            
+            questionBlock.appendChild(loText);
+
+            const questionText = document.createElement('p');
+            questionText.classList.add('question-text');
+            questionText.innerHTML = `${index + 1}. ${qData.question}`;
+            questionBlock.appendChild(questionText);
+
+            const optionsDiv = document.createElement('div');
+            optionsDiv.classList.add('options');
+
+            for (const optionKey in qData.options) {
+                const optionId = `q${index}_${optionKey}`;
+                const label = document.createElement('label');
+                label.htmlFor = optionId;
+                const radioInput = document.createElement('input');
+                radioInput.type = 'radio';
+                radioInput.name = `q${index}`;
+                radioInput.value = optionKey;
+                radioInput.id = optionId;
+                const labelText = document.createElement('span');
+                labelText.textContent = ` ${optionKey}. ${qData.options[optionKey]}`;
+                label.appendChild(radioInput);
+                label.appendChild(labelText);
+                optionsDiv.appendChild(label);
+            }
+            questionBlock.appendChild(optionsDiv);
+
+            const buttonContainer = document.createElement('div');
+            buttonContainer.classList.add('button-container');
+
+            const checkButton = document.createElement('button');
+            checkButton.textContent = 'Check Answer';
+            checkButton.classList.add('check-button');
+            checkButton.onclick = () => checkAnswer(index);
+            buttonContainer.appendChild(checkButton);
+            
+            questionBlock.appendChild(buttonContainer);
+
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.classList.add('feedback');
+            questionBlock.appendChild(feedbackDiv);
+
+            quizContainer.appendChild(questionBlock);
+        });
+    }
+
+    function checkAnswer(questionIndex) {
+        const questionBlockElement = document.getElementById(`q${questionIndex}`);
+        const selectedRadioButton = questionBlockElement.querySelector('input[type="radio"]:checked');
+
+        if (!selectedRadioButton) {
+            alert("Please select an answer first.");
+            return;
+        }
+
+        const selectedOptionKey = selectedRadioButton.value;
+        const qData = quizData[questionIndex];
+        const feedbackDiv = questionBlockElement.querySelector('.feedback');
+        const correct = selectedOptionKey === qData.correctAnswer;
+        
+        const loTextElement = questionBlockElement.querySelector('.learning-objective');
+        
+        // Reveal the full learning objective from the data attribute
+        loTextElement.innerHTML = loTextElement.dataset.fullLo;
+
+        let feedbackHTML = '';
+
+        if (correct) {
+            feedbackHTML = `<span class="feedback-status">Correct!</span>`;
+            feedbackDiv.className = 'feedback correct';
+        } else {
+             feedbackHTML = `<span class="feedback-status">Incorrect. The correct answer is ${qData.correctAnswer}.</span>`;
+            feedbackDiv.className = 'feedback incorrect';
+        }
+
+        feedbackHTML += `<div class="feedback-rationale"><strong>Rationale:</strong> ${qData.rationale}</div>`;
+        feedbackHTML += `<div class="feedback-source"><strong>Source:</strong> ${qData.source}</div>`;
+        feedbackDiv.innerHTML = feedbackHTML;
+    }
+
+    themeToggleButton.addEventListener('click', () => {
+        if (bodyElement.classList.contains('light-theme')) {
+            applyTheme('dark');
+        } else {
+            applyTheme('light');
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('quizTheme') || 'dark';
+        applyTheme(savedTheme);
+        loadQuiz();
+    });
+
+</script>
+  
+</body>
+</html>
